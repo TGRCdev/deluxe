@@ -13,9 +13,7 @@ pub use syn::{
     token::{Brace, Bracket, Paren},
 };
 use syn::{
-    parse::{ParseBuffer, ParseStream},
-    spanned::Spanned,
-    Token,
+    parse::{ParseBuffer, ParseStream}, spanned::Spanned, AngleBracketedGenericArguments, Expr, Token
 };
 
 /// Temporary container for storing parsing state for a single field.
@@ -599,25 +597,21 @@ where
     Ok(())
 }
 
-/// Skips over items in a [`ParseStream`](syn::parse::ParseStream) until a comma is reached.
-///
-/// Consumes all tokens up until the comma. Does not consume the comma.
+/// Skips over [`Expr`]s until a comma is reached, EOF is reached, or an error occurs.
+/// Also consumes an equals sign at the start if it is present.
 #[inline]
 pub fn skip_meta_item(input: ParseStream) {
-    input
-        .step(|cursor| {
-            let mut cur = *cursor;
-            while let Some((tt, next)) = cur.token_tree() {
-                if let TokenTree::Punct(punct) = tt {
-                    if punct.as_char() == ',' {
-                        break;
-                    }
-                }
-                cur = next;
+    input.parse::<Option<Token![=]>>().ok();
+    while !input.is_empty() && !input.peek(Token![,]) {
+        if input.peek(Token![<]) {
+            if input.parse::<AngleBracketedGenericArguments>().is_err() {
+                break
             }
-            Ok(((), cur))
-        })
-        .ok();
+        }
+        else if input.parse::<Expr>().is_err() {
+            break
+        }
+    }
 }
 
 /// Consumes all tokens left in a list of streams.
