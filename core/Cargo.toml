@@ -1,6 +1,6 @@
 [package]
 name = "deluxe-core-tg"
-version = "0.5.0"
+version = "0.5.0-DONOTUSE.1"
 edition = "2021"
 description = "Vendored version of deluxe for `bevy-butler`, due to cargo not supporting nested workspaces."
 license = "MIT"
