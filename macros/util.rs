@@ -9,7 +9,7 @@ pub fn parse<T: Parse>(input: proc_macro::TokenStream, errors: &Errors) -> Optio
 
 fn crate_path(errors: Option<&Errors>) -> Option<syn::Path> {
     use proc_macro_crate::FoundCrate;
-    const CRATE_NAME: &str = "deluxe";
+    const CRATE_NAME: &str = env!("CARGO_CRATE_NAME");
 
     let crate_name = match proc_macro_crate::crate_name(CRATE_NAME) {
         Ok(FoundCrate::Name(name)) => name,
